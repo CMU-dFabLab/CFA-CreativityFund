@@ -1,3 +1,5 @@
+#hi Pedro!!!!!!
+
 import numpy as np
 import cv2
 horzlino=1920
