@@ -1,7 +1,4 @@
-This is Darcy's branch!!!
-Why are you so confusing github QAQ
-ahhhhhhhhhhhh
-
+"""This is OUR branch!!!"""
 import numpy as np
 import cv2
 horzlino=1920
