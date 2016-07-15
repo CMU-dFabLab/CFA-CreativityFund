@@ -93,7 +93,8 @@ def main():
 
 
   #STEP 0: SETTING VARIABLES
-  base_path = "C:\\Users\\Pedro\\Google Drive\\CMoA_Plaster\\SL - Python Implementation\\HHSL3DScanner\\"
+  #base_path = "C:\\Users\\Pedro\\Google Drive\\CMoA_Plaster\\SL - Python Implementation\\HHSL3DScanner\\"
+  base_path = "T:\\Darcy\\COMA-PLASTER\\"
 
   camera_settings = ({10: 30.0, 11: 5.0, 12: 100.0, 15: -8.0, 17: 10000.0, 
     3: 1920.0, 4: 1080.0})
