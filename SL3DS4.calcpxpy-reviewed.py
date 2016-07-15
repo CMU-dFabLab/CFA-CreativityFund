@@ -13,18 +13,24 @@ base_path = "T:\\Darcy\\COMA-PLASTER\\"
 rightcamcode=np.load(base_path+"CAMR\\coloccod.npy" )
 leftcamcode=np.load(base_path+"CAML\\coloccod.npy" )
 
-thresholdleft=np.load("thresholdleft.npy" )
-thresholdright=np.load("thresholdright.npy" )
+#threshold
+thresholdleft=np.load(base_path + "thresholdleft.npy" )
+thresholdright=np.load(base_path + "thresholdright.npy" )
 
-imgmaskrightf ="CAMR/CAM001.png"
-img1=cv2.imread(imgmaskrightf,cv2.IMREAD_GRAYSCALE)
-ret,img1 = cv2.threshold(img1,thresholdright,255,cv2.THRESH_TOZERO)
-imgmaskright=np.divide(img1,img1)
+#firstImage
+imgmaskrightf ="CAMR\\CAM001.png"
+imgmaskleftf ="CAML\\CAM101.png"
 
-imgmaskleftf ="CAML/CAM101.png"
-img1=cv2.imread(imgmaskleftf,cv2.IMREAD_GRAYSCALE)
-ret,img1 = cv2.threshold(img1,thresholdleft,255,cv2.THRESH_TOZERO)
-imgmaskleft=np.divide(img1,img1)
+def createMask(threshold, firstImage):
+  img1=cv2.imread(firstImage,cv2.IMREAD_GRAYSCALE)
+  ret,img1 = cv2.threshold(img1,threshold,255,cv2.THRESH_TOZERO)
+  imgmask=np.divide(img1,img1)
+  return imgmask
+
+imgmaskright=createMask(thresholdleft, imgmaskleftf)
+imgmaskleft=createMask(thresholdright, imgmaskrightf)
+
+
 
 kkl=0
 kkr=0
