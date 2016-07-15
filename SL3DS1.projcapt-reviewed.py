@@ -124,4 +124,3 @@ def main():
   houseKeeping(video_captures)
 
 main()
-
