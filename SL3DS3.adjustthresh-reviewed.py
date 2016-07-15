@@ -24,7 +24,7 @@ def getBestThreshold(ii, img):
         cv2.putText(img1th,"Threshold is "+str(ii), (10,50), cv2.FONT_HERSHEY_SIMPLEX, 2, 255)
         cv2.imshow("PWindow2",img1th)
         k = cv2.waitKey(0)  
-        if k == 113:#press q
+        if k == 113:#press q lowercase
             break
         elif k == 2555904: #press right
             ii=ii+1

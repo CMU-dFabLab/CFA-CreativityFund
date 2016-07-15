@@ -7,11 +7,11 @@ old_settings = np.seterr(all='ignore')
 horzlino=1920
 vertlino=1080
 
+base_path = "T:\\Darcy\\COMA-PLASTER\\"
+#temp_path = base_path + "CAML"+ "\\"
 #loading color code (gray code) files from step 2 to map the coordinates
-Direct="CAMR/"
-rightcamcode=np.load(Direct+"coloccod.npy" )
-Direct="CAML/"
-leftcamcode=np.load(Direct+"coloccod.npy" )
+rightcamcode=np.load(base_path+"CAMR\\coloccod.npy" )
+leftcamcode=np.load(base_path+"CAML\\coloccod.npy" )
 
 thresholdleft=np.load("thresholdleft.npy" )
 thresholdright=np.load("thresholdright.npy" )
