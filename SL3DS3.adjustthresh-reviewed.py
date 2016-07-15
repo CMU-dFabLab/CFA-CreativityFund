@@ -34,12 +34,12 @@ def getBestThreshold(ii, img):
     return ii
 
 iiLeft = getBestThreshold(ii, imgleft)
-np.save(base_path +"\\thresholdleft" , iiLeft)
+np.save(base_path + "\\thresholdleft" , iiLeft)
     
 temp_path = base_path + "CAMR" + "\\"
 right_img_names = glob.glob(temp_path + "*.png")
 imgRight=cv2.imread(right_img_names[0],cv2.IMREAD_GRAYSCALE)
 
 iiRight = getBestThreshold(iiLeft, imgRight)
-np.save("thresholdright" , iiRight)
+np.save(base_path + "thresholdright" , iiRight)
 print ('Threshold Done!')
