@@ -7,7 +7,7 @@ old_settings = np.seterr(all='ignore')
 horzlino=1920
 vertlino=1080
 
-
+#loading color code (gray code) files from step 2 to map the coordinates
 Direct="CAMR/"
 rightcamcode=np.load(Direct+"coloccod.npy" )
 Direct="CAML/"
