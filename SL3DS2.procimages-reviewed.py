@@ -91,8 +91,8 @@ def processingCamera(horzlino, vertlino, img_names):
       imgbin3[jj][ii][0]= 4 #????
   
   img1 = (grayimg % 255) #is this line uselesss?????
-  cv2.imshow("PWindow2",imgbin3) #displaying result for horizontal 
-  cv2.waitKey(20000)
+  cv2.imshow("PWindow1",imgbin3) #displaying result for horizontal 
+  cv2.waitKey(3000)
 
   # VERTICAL 
   #start with image corresponding to the white projection
@@ -126,7 +126,7 @@ def processingCamera(horzlino, vertlino, img_names):
   
   img1 = (grayimg%255) #is this line useless again?
   cv2.imshow("PWindow2",imgbin3)
-  cv2.waitKey(20000)
+  cv2.waitKey(3000)
   return camcode
 
 
@@ -148,7 +148,7 @@ temp_path_right = base_path + "CAMR\\"
 img_names_right = glob.glob(temp_path_right + "*.png")
 #call for processing the cameras
 camcode = processingCamera(horzlino, vertlino, img_names_right)
-np.save(base_path + "coloccod", camcode)
+np.save(temp_path_right + "coloccod", camcode)
 cv2.waitKey(200)
 
 cv2.destroyAllWindows()
