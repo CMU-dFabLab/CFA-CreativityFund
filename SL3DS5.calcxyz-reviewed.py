@@ -19,7 +19,7 @@ def camxyzparam(pxpy):
     alfa, beta = tetr, phir 
     gama = 0  
     Rright = np.array([[math.cos(gama), -math.sin(gama), 0], [math.sin(gama), math.cos(gama), 0], [0, 0, 1]])
-    Rright = Rright.dot(np.array([[1 , 0, 0], [0, math.cos(beta), -math.sin(beta)] , [0, math.sin(beta), math.cos(beta)]]))
+    Rright = Rright.dot(np.array([[1, 0, 0], [0, math.cos(beta), -math.sin(beta)] , [0, math.sin(beta), math.cos(beta)]]))
     Rright = Rright.dot(np.array([[math.cos(alfa), 0, -math.sin(alfa)], [0, 1, 0], [math.sin(alfa), 0, math.cos(alfa)]])) 
     XA = np.array(Rright.dot(([[x1],[y1],[z1]]))+([[x0],[ y0],[ z0]]))
     x1, y1, z1 = XA[0], XA[1], XA[2] 
@@ -52,10 +52,10 @@ ii=0
 rightcod=[]
 import csv
 
-with open('rightcod', 'rb') as csvfile:
+with open('rightcod', 'rt') as csvfile:
      xyreader = csv.reader(csvfile, delimiter=',', quotechar='|')
      for row in xyreader:
-         rightcod.append([int(row[0]),int(row[1]),int(row[2])])
+        rightcod.append([int(row[0]),int(row[1]),int(row[2])])
 
 a = np.array(rightcod)
 aa=a[a[:,0].argsort(),]
@@ -72,7 +72,7 @@ csvfile.close()
 #==================================================================
 ii=0
 leftcod=[]
-with open('leftcod', 'rb') as csvfile:
+with open('leftcod', 'rt') as csvfile:
      xyreader = csv.reader(csvfile, delimiter=',', quotechar='|')
      for row in xyreader:
          leftcod.append([int(row[0]),int(row[1]),int(row[2])])
@@ -99,9 +99,11 @@ maskrightindex=np.searchsorted(rightcodmean[:,0],unicod)
 maskleft=np.in1d(unicod,leftcodmean[:,0])
 maskleftindex=np.searchsorted(leftcodmean[:,0],unicod)
 
-
-camrcolor=cv2.imread("CAMR/CAM001.png");
-camrcolol=cv2.imread("CAML/CAM101.png");
+base_path = "T:\\Darcy\\COMA-PLASTER\\"
+imgright = base_path + "CAMR\\CAM001.png"
+imgleft = base_path + "CAML\\CAM101.png"
+camrcolor=cv2.imread(imgright);
+camrcolol=cv2.imread(imgleft);
 
 
 
@@ -125,6 +127,7 @@ for ii in range(0,m-1):
            xyz[kk,1]= -xyzdata[1]
            xyz[kk,2]= -xyzdata[2]
            # color info from average of image from both cameras
+           #print(camrcolol)
            xyzcolor[kk,0]= (camrcolor[int(matchpixels[1]),int(matchpixels[0]),2]/2+camrcolol[int(matchpixels[3]),int(matchpixels[2]),2]/2)
            xyzcolor[kk,1]= (camrcolor[int(matchpixels[1]),int(matchpixels[0]),1]/2+camrcolol[int(matchpixels[3]),int(matchpixels[2]),1]/2) 
            xyzcolor[kk,2]= (camrcolor[int(matchpixels[1]),int(matchpixels[0]),0]/2+camrcolol[int(matchpixels[3]),int(matchpixels[2]),0]/2)
@@ -136,7 +139,8 @@ for ii in range(0,m-1):
 print ('Total points = ',kk-1)
 
 # open a PLY file to save the XYZ and colors of point cloud
-ff=open(captdirect+"/"+"pointcloud.ply","w")
+
+ff=open(base_path+"/"+"pointcloud.ply","w")
 ff.write('ply\n')
 ff.write('format ascii 1.0\n')
 ff.write('comment PCL generated\n')
@@ -150,8 +154,19 @@ ff.write('property uchar blue\n')
 ff.write('end_header\n')
 
 
+xs = open(base_path+"/"+"xs.csv","w")
+ys = open(base_path+"/"+"ys.csv","w")
+zs = open(base_path+"/"+"zs.csv","w")
 for ii in range(0,kk-1):
     ff.write(str(xyz[ii,0])+" "+str(xyz[ii,1])+" "+str(xyz[ii,2])+" "+str(xyzcolor[ii,0])+" "+str(xyzcolor[ii,1])+" "+str(xyzcolor[ii,2])+"\n")       
-
+    xs.write(str(xyz[ii,0]) + "\n")
+    ys.write(str(xyz[ii,1]) + "\n")
+    zs.write(str(xyz[ii,2]) + "\n")
 ff.close()
-print ('calcxyzcolor Done!')
+xs.close()
+ys.close()
+zs.close()
+
+
+print ('calcxyzcolor Done!\n\n\n')
+
