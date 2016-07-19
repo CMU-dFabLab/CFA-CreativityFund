@@ -4,24 +4,13 @@ import os
 import glob
 import operator
 
-old_settings = np.seterr(all='ignore')
-
-horzlino=1280
-vertlino=720
-base_path = "T:\\Darcy\\COMA-PLASTER\\"
-#loading color code (gray code) files from step 2 to map the coordinates
-rightcamcode=np.load(base_path+"CAMR\\coloccod.npy" )
-leftcamcode=np.load(base_path+"CAML\\coloccod.npy" )
-
+#HELPER FUNCTIONS
 def visualizeImage(img_name, img_title):
   window_name = "test"
   cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
   cv2.setWindowProperty(window_name, cv2.WND_PROP_FULLSCREEN, 
     cv2.WINDOW_AUTOSIZE)
   cv2.resizeWindow(window_name, 1280, 720)
-  visualize(window_name, img_name, img_title)
-
-def visualize(window_name, img_name, img_title):
   cv2.imshow(window_name, img_name) #this will show everything in 0 or 1
   cv2.waitKey(10000)
   print("\n\n\n\n\n{} = ".format(img_title))
@@ -29,22 +18,35 @@ def visualize(window_name, img_name, img_title):
   print (row)
 
 def imageFrom3dmatrix(matrix, level):
+  """ isolates one level (2d-matrix) from a 3d matrix """
   #rcode = imageFrom3dmatrix(rightcamcode, 0)
   f = lambda x : x[level]
   return np.apply_along_axis(f, 2, matrix)
-
-#threshold
-thresholdleft=np.load(base_path + "thresholdleft.npy" )
-thresholdright=np.load(base_path + "thresholdright.npy" )
-#firstImage
-imgmaskrightf = base_path + "CAMR\\CAM001.png"
-imgmaskleftf = base_path + "CAML\\CAM101.png"
 
 def createMask(threshold, firstImage):
   img1=cv2.imread(firstImage,cv2.IMREAD_GRAYSCALE)
   ret,img1 = cv2.threshold(img1,threshold,255,cv2.THRESH_TOZERO)
   imgmask=np.divide(img1,img1)
   return imgmask
+
+#SETTING VARIABLES
+
+#ignore division by 0 and other errors
+old_settings = np.seterr(all='ignore')
+horzlino=1280
+vertlino=720
+base_path = "T:\\Darcy\\COMA-PLASTER\\"
+
+#loading color code (gray code) files from step 2 to map the coordinates
+rightcamcode=np.load(base_path+"CAMR\\coloccod.npy" )
+leftcamcode=np.load(base_path+"CAML\\coloccod.npy" )
+
+#threshold
+thresholdleft=np.load(base_path + "thresholdleft.npy" )
+thresholdright=np.load(base_path + "thresholdright.npy" )
+#first images (white projection) will be used to detect shadows
+imgmaskrightf = base_path + "CAMR\\CAM001.png"
+imgmaskleftf = base_path + "CAML\\CAM101.png"
 
 imgmaskleft=createMask(thresholdleft, imgmaskleftf)
 imgmaskright=createMask(thresholdright, imgmaskrightf)
