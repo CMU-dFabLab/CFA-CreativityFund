@@ -81,10 +81,10 @@ def getSortedUniqueColoc(horzlino, vertlino, Rcamcode, Lcamcode, imgmaskR, imgma
   newlistr=np.unique(rightsrtt) 
   np.savetxt("colocrightsrtuniq" , newlistr ,fmt='%d', delimiter=', ', newline='\n')
 
-  return (newlistr, newlistl, colocrightsrt, colocleftsrt)
+  return (newlistr, newlistl, colocrightsrt, colocleftsrt, rightsrtt, leftsrtt)
 
 
-def getMatchpixels(newlistr, newlistl, colocrightsrt, colocleftsrt):
+def getMatchpixels(newlistr, newlistl, colocrightsrt, colocleftsrt, rightsrtt, leftsrtt):
   #finding common points in both cameras
   #Return the sorted, unique values that are in both of the input arrays.
   camunio=np.intersect1d(newlistl,newlistr)
@@ -102,12 +102,12 @@ def getMatchpixels(newlistr, newlistl, colocrightsrt, colocleftsrt):
   for i in camunio:
       while (rightsrtt[kkr] != i):
           kkr=kkr+1
-          matchpixels[kk][0]=colocrightsrt[kkr][1]  # right camera x pixel coordinate
-          matchpixels[kk][1]=colocrightsrt[kkr][2]  # right camera y pixel coordinate
       while (leftsrtt[kkl] != i):
           kkl=kkl+1
-          matchpixels[kk][2]=colocleftsrt[kkl][1]   #left camera x pixel coordinate
-          matchpixels[kk][3]=colocleftsrt[kkl][2]   #left camera y pixel coordinate
+      matchpixels[kk][2]=colocleftsrt[kkl][1]   #left camera x pixel coordinate
+      matchpixels[kk][3]=colocleftsrt[kkl][2]   #left camera y pixel coordinate
+      matchpixels[kk][0]=colocrightsrt[kkr][1]  # right camera x pixel coordinate
+      matchpixels[kk][1]=colocrightsrt[kkr][2]  # right camera y pixel coordinate
       kk=kk+1
 
   np.savetxt("colocuniq" , matchpixels ,fmt='%d', delimiter=',', newline='\n')
@@ -137,10 +137,10 @@ imgmaskleftf = base_path + "CAML\\CAM101.png"
 imgmaskleft=createMask(thresholdleft, imgmaskleftf)
 imgmaskright=createMask(thresholdright, imgmaskrightf)
 print("Mask done!")
-newlistr, newlistl, colocrightsrt, colocleftsrt = getSortedUniqueColoc(horzlino, vertlino, 
+newlistr, newlistl, colocrightsrt, colocleftsrt, rightsrtt, leftsrtt = getSortedUniqueColoc(horzlino, vertlino, 
   rightcamcode, leftcamcode, imgmaskright, imgmaskleft)
 print ("leftcod, rightcod, colocleftsrt, colocleftsrtuniq, colocrightsrt, colocrightsrtuniq saved!")
 #sortColocAndSrt(colocright, colocleft, rightsrt, leftsrt)
 #print ("sorted and saved!")
-getMatchpixels(newlistr, newlistl, colocrightsrt, colocleftsrt)
+getMatchpixels(newlistr, newlistl, colocrightsrt, colocleftsrt, rightsrtt, leftsrtt)
 print ('calcxy1xy2 Done!')
