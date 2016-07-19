@@ -2,29 +2,52 @@ import numpy as np
 import cv2
 import os
 import glob
+import operator
+
 old_settings = np.seterr(all='ignore')
 
-horzlino=1920
-vertlino=1080
+horzlino=1280
+vertlino=720
+base_path = "T:\\Darcy\\COMA-PLASTER\\"
+#loading color code (gray code) files from step 2 to map the coordinates
+rightcamcode=np.load(base_path+"CAMR\\coloccod.npy" )
+leftcamcode=np.load(base_path+"CAML\\coloccod.npy" )
 
+def visualizeImage(img_name, img_title):
+  window_name = "test"
+  cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
+  cv2.setWindowProperty(window_name, cv2.WND_PROP_FULLSCREEN, 
+    cv2.WINDOW_AUTOSIZE)
+  cv2.resizeWindow(window_name, 1280, 720)
+  visualize(window_name, img_name, img_title)
 
-Direct="CAMR/"
-rightcamcode=np.load(Direct+"coloccod.npy" )
-Direct="CAML/"
-leftcamcode=np.load(Direct+"coloccod.npy" )
+def visualize(window_name, img_name, img_title):
+  cv2.imshow(window_name, img_name) #this will show everything in 0 or 1
+  cv2.waitKey(10000)
+  print("\n\n\n\n\n{} = ".format(img_title))
+  row = [img_name[len(img_name)//2][i] for i in range(len(img_name[0]))]
+  print (row)
 
-thresholdleft=np.load("thresholdleft.npy" )
-thresholdright=np.load("thresholdright.npy" )
+def imageFrom3dmatrix(matrix, level):
+  #rcode = imageFrom3dmatrix(rightcamcode, 0)
+  f = lambda x : x[level]
+  return np.apply_along_axis(f, 2, matrix)
 
-imgmaskrightf ="CAMR/CAM001.png"
-img1=cv2.imread(imgmaskrightf,cv2.IMREAD_GRAYSCALE)
-ret,img1 = cv2.threshold(img1,thresholdright,255,cv2.THRESH_TOZERO)
-imgmaskright=np.divide(img1,img1)
+#threshold
+thresholdleft=np.load(base_path + "thresholdleft.npy" )
+thresholdright=np.load(base_path + "thresholdright.npy" )
+#firstImage
+imgmaskrightf = base_path + "CAMR\\CAM001.png"
+imgmaskleftf = base_path + "CAML\\CAM101.png"
 
-imgmaskleftf ="CAML/CAM101.png"
-img1=cv2.imread(imgmaskleftf,cv2.IMREAD_GRAYSCALE)
-ret,img1 = cv2.threshold(img1,thresholdleft,255,cv2.THRESH_TOZERO)
-imgmaskleft=np.divide(img1,img1)
+def createMask(threshold, firstImage):
+  img1=cv2.imread(firstImage,cv2.IMREAD_GRAYSCALE)
+  ret,img1 = cv2.threshold(img1,threshold,255,cv2.THRESH_TOZERO)
+  imgmask=np.divide(img1,img1)
+  return imgmask
+
+imgmaskleft=createMask(thresholdleft, imgmaskleftf)
+imgmaskright=createMask(thresholdright, imgmaskrightf)
 
 kkl=0
 kkr=0
@@ -34,6 +57,7 @@ colocleft=[]
 leftsrt=[]
 rightsrt=[]
 # finding similar points in both camera bast on projected pattern
+# rightcamcode and leftcamcode are 3d lists with 1024 768 2 elements in each layer
 for ii in range(0, horzlino):
     for jj in range(0, vertlino):
         if (rightcamcode[jj][ii][0]!=0 and rightcamcode[jj][ii][1]!=0 and imgmaskright[jj][ii]!=0):
@@ -46,36 +70,51 @@ for ii in range(0, horzlino):
            kkr=kkr+1
 
 print (kkr,kkl)
+
+#lists with the 
 np.savetxt("leftcod" , colocleft ,fmt='%d', delimiter=', ', newline='\n')
 np.savetxt("rightcod" , colocright ,fmt='%d', delimiter=', ', newline='\n')
 
-import operator
 colocrightsrt=[]
 colocleftsrt=[]
+
 colocrightsrt=sorted(colocright, key=operator.itemgetter(0))
 colocleftsrt=sorted(colocleft, key=operator.itemgetter(0))
 rightsrtt=sorted(rightsrt)
 leftsrtt=sorted(leftsrt)
 
-kkr=0
-np.save("colocrightsrt" , colocrightsrt)
+"""
+print(colocright[0:10])
+print("\n",colocleft[0:10])
+print("\n\n\n\n",colocrightsrt[0:10])
+print("\n",colocleftsrt[0:10])
+"""
+
+#saving sorted [[value, LCx, LCy], [value, LCx, LCy], [value, LCx, LCy] ...] - allows repeated
+#saving sorted [value, value, value ...] - unique
 np.save("colocleftsrt" , colocleftsrt)
-newlistl=np.unique(leftsrtt)
+newlistl=np.unique(leftsrtt) 
 np.savetxt("colocleftsrtuniq" , newlistl ,fmt='%d', delimiter=', ', newline='\n')
-newlistr=np.unique(rightsrtt)
+np.save("colocrightsrt" , colocrightsrt)
+newlistr=np.unique(rightsrtt) 
 np.savetxt("colocrightsrtuniq" , newlistr ,fmt='%d', delimiter=', ', newline='\n')
 
 #finding common points in both cameras
 camunio=np.intersect1d(newlistl,newlistr)
-
+print(len(camunio), camunio, "\n\n\n")
 kkl=0
 kkr=0
 kk=0
 matchpixels=np.zeros((np.size(camunio),4), dtype=np.int16)
-matchpixels[kk][0]=0
-matchpixels[kk][1]=0
-matchpixels[kk][2]=0
-matchpixels[kk][3]=0
+print(matchpixels, "\n\n\n")
+#matchpixels[kk][0], matchpixels[kk][1], matchpixels[kk][2], matchpixels[kk][3] = 0, 0, 0, 0
+
+"""
+I don't understand yet the logic of the while loop... it seems the opposite of what I would do.
+It is using a unique list of intersected values to find out the coordinates first pixel with that value
+in each camera to fill the arrays cited above. This is going to take all the crazy parallel arrays and 
+it is going to generate a list of arrays of 4 elements: [CRx, CRy, CLx, CLy].
+"""
 for i in camunio:
     while (newlistr[kkr] != i):
         kkr=kkr+1
