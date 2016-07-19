@@ -132,17 +132,24 @@ def processingCamera(horzlino, vertlino, img_names):
 
 #STEP 0: setting variables
 print("Start")
-base_path = "C:\\Users\\Pedro\\Google Drive\\CMoA_Plaster\\SL - Python Implementation\\HHSL3DScanner\\"
+base_path = "T:\\Darcy\\COMA-PLASTER\\"
 horzlino= 1280 #1920 #1280
 vertlino= 720 #1080 #768
 n_cameras = 2
-for i in range(n_cameras):
-  temp_path = base_path + "CAM" + str(i) + "\\"
-  img_names = glob.glob(temp_path + "*.png")
-  #call for processing the cameras
-  camcode = processingCamera(horzlino, vertlino, img_names)
-  np.save(base_path + "coloccod" + str(i), camcode)
-  cv2.waitKey(200)
+
+temp_path_left = base_path + "CAML\\"
+img_names_left = glob.glob(temp_path_left + "*.png")
+#call for processing the cameras
+camcode = processingCamera(horzlino, vertlino, img_names_left)
+np.save(temp_path_left + "coloccod", camcode)
+cv2.waitKey(200)
+
+temp_path_right = base_path + "CAMR\\"
+img_names_right = glob.glob(temp_path_right + "*.png")
+#call for processing the cameras
+camcode = processingCamera(horzlino, vertlino, img_names_right)
+np.save(base_path + "coloccod", camcode)
+cv2.waitKey(200)
 
 cv2.destroyAllWindows()
 print ('Procimg Done!')
