@@ -3,40 +3,37 @@ import cv2
 import math
 def camxyzparam(pxpy):
     ##################################################### function for calculating X,Y, and Z of points   
-    fcl=0.00269816   #pixel size for left camera Focal Length   
-    fcr=0.00269816  #pixel size for right camera
-    tetl=0.26179938779914943653855361527329     #left camera rotation angle around Y axis (15 deg)
-    tetr=-0.26179938779914943653855361527329    #right camera rotation angle
-    phil=0     #left camera rotation angle around X axis
-    phir=0 
-    x0l=250     # left camera translation in X direction
-    x0r=-250 
-    y0l=0      # right camera translation in Y direction
-    y0r=0 
-    z0l=0    
-    z0r=0 
-    ccddr=3.67    #focal lenght right camera mm
-    ccddl=3.67    #focal lenght left camera
+    fcr, fcl = 0.00269816, 0.00269816   #pixel size Focal Length for both cameras
+    tetl = 0.26179938779914943653855361527329     #left camera rotation angle around Y axis (15 deg)
+    tetr = -0.26179938779914943653855361527329    #right camera rotation angle
+    phir, phil = 0, 0     #rotation angle around X axis 
+    x0r, x0l = -250, 250     #translation in X direction
+    y0r, y0l = 0, 0      #translation in Y direction
+    z0r, z0l = 0, 0    
+    ccddr, ccddl = 3.67, 3.67    #focal lenght for both cameras mm
     ###################################################
-    x0=x0r 
-    y0=y0r 
-    z0=z0r 
-    x1=-(pxpy[0]-960)*fcr   #px1
-    y1=(pxpy[1]-540)*fcr   #py1 
-    z1=ccddr
-    alfa=tetr 
-    beta=phir 
+    x0, y0, z0 = x0r, y0r, z0r 
+    x1, y1, z1 = -(pxpy[0]-960)*fcr, (pxpy[1]-540)*fcr, ccddr   #px1 py1 pz1
+    alfa, beta = tetr, phir 
     gama=0  
-    Rright = np.array([[math.cos(gama), -math.sin(gama), 0],[math.sin(gama), math.cos(gama), 0],[   0, 0, 1]])
-    Rright = Rright.dot(np.array([[1 ,0 ,0 ], [0 ,math.cos(beta), -math.sin(beta)] , [0 ,math.sin(beta), math.cos(beta)]]))
-    Rright = Rright.dot(np.array([[math.cos(alfa),0 ,-math.sin(alfa)], [0, 1, 0], [math.sin(alfa), 0, math.cos(alfa)]])) 
+    #rotation about z axis
+    Rright = np.array([[math.cos(gama), -math.sin(gama), 0],
+                       [math.sin(gama),  math.cos(gama), 0],
+                       [             0,               0, 1]])
+    #rotation about x axis
+    Rright = Rright.dot(np.array([[ 1,             0,               0], 
+                                  [ 0,math.cos(beta), -math.sin(beta)] , 
+                                  [ 0,math.sin(beta),  math.cos(beta)]]))
+    #rotation about y axis
+    Rright = Rright.dot(np.array([[math.cos(alfa), 0,-math.sin(alfa)], 
+                                  [             0, 1,              0], 
+                                  [math.sin(alfa), 0, math.cos(alfa)]])) 
+    #rotation and translation
     XA=np.array(Rright.dot(([[x1],[y1],[z1]]))+([[x0],[ y0],[ z0]]))
-    x1=XA[0]   
-    y1=XA[1]   
-    z1=XA[2] 
-    x2=x0l 
-    y2=y0l 
-    z2=z0l 
+    #result for camera 1
+    x1, y1, z1=XA[0], XA[1], XA[2]   
+
+    x2, y2, z2=x0l, y0l, z0l
     xh3=-(pxpy[2]-960)*fcl   #px2
     yh3=(pxpy[3]-540)*fcl   #py2 
     zh3=ccddl 
