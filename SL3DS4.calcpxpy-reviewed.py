@@ -10,9 +10,6 @@ def visualizeImage(img_name, img_title):
   cv2.setWindowProperty(window_name, cv2.WND_PROP_FULLSCREEN, 
     cv2.WINDOW_AUTOSIZE)
   cv2.resizeWindow(window_name, 1280, 720)
-  visualize(window_name, img_name, img_title)
-
-def visualize(window_name, img_name, img_title):
   cv2.imshow(window_name, img_name) #this will show everything in 0 or 1
   cv2.waitKey(10000)
   print("\n\n\n\n\n{} = ".format(img_title))
@@ -20,19 +17,16 @@ def visualize(window_name, img_name, img_title):
   print (row)
 
 def imageFrom3dmatrix(matrix, level):
+  """ isolates one level (2d-matrix) from a 3d matrix """
   #rcode = imageFrom3dmatrix(rightcamcode, 0)
   f = lambda x : x[level]
   return np.apply_along_axis(f, 2, matrix)
-
 
 def createMask(threshold, firstImage):
   img1=cv2.imread(firstImage,cv2.IMREAD_GRAYSCALE)
   ret,img1 = cv2.threshold(img1,threshold,255,cv2.THRESH_TOZERO)
   imgmask=np.divide(img1,img1)
   return imgmask
-
-
-
 
 def getSortedUniqueColoc(horzlino, vertlino, Rcamcode, Lcamcode, imgmaskR, imgmaskL):
   """
@@ -113,8 +107,6 @@ def getMatchpixels(newlistr, newlistl, colocrightsrt, colocleftsrt):
   np.savetxt("colocuniq" , matchpixels ,fmt='%d', delimiter=',', newline='\n')
   return matchpixels
 
-
-
 old_settings = np.seterr(all='ignore')
 
 horzlino=1280
@@ -134,6 +126,7 @@ imgmaskleftf = base_path + "CAML\\CAM101.png"
 
 
 #create masks
+>>>>>>> Darcy
 imgmaskleft=createMask(thresholdleft, imgmaskleftf)
 imgmaskright=createMask(thresholdright, imgmaskrightf)
 print("Mask done!")
