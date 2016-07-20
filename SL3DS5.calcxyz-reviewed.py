@@ -103,9 +103,13 @@ print ('Total points left= ',m)
 leftcodmean=np.zeros([m,3])
 
 for ii in range(0,m-1):
+<<<<<<< HEAD
     leftcodmean[ii]=[aaa[ii],
     np.mean(aa[left_idx[ii]:left_idx[ii+1],1]),
     np.mean(aa[left_idx[ii]:left_idx[ii+1],2])]
+=======
+    leftcodmean[ii]=[aaa[ii],np.mean(aa[left_idx[ii]:left_idx[ii+1],1]),np.mean(aa[left_idx[ii]:left_idx[ii+1],2])]
+>>>>>>> refs/heads/master
 
 codes=np.append(rightcodmean[:,0],leftcodmean[:,0])
 unicod=np.unique(codes[:])
