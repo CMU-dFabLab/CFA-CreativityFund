@@ -3,11 +3,15 @@ import cv2
 import math
 import csv
 
-
-def RotateAndTranslate( x, y, z, pxpy, i, fc, ccdd, tet, phi):
-    x1, y1, z1 = -(pxpy[i]-960)*fc, (pxpy[i+1]-540)*fc, ccdd
+def RotateAndTranslate( x, y, z, pxpy, i, fc, ccdd, tet, phi, cameraWidth, cameraHeight):
+    #STEP1: from pixel space to camera space
+    #moves the origin to the center of the image and multiplies the pixel coordinate
+    #by (focal length * pixel size) to scale back to the camera frame 
+    x1, y1, z1 = -(pxpy[i]-cameraWidth/2)*fc, (pxpy[i+1]-cameraHeight/2)*fc, ccdd
     alfa, beta = tet, phi
     gama = 0  
+
+    #STEP2 from camera space to world space
     #rotation about z axis
     Rright = np.array([[math.cos(gama), -math.sin(gama), 0],
                        [math.sin(gama),  math.cos(gama), 0],
@@ -27,8 +31,9 @@ def RotateAndTranslate( x, y, z, pxpy, i, fc, ccdd, tet, phi):
     return (x1, y1, z1)
 
 
-def camxyzparam(pxpy):
-    ##################################################### function for calculating X,Y, and Z of points   
+def camxyzparam(pxpy, cameraWidth, cameraHeight):
+    """function for calculating X,Y, and Z of points"""   
+    #setting camera parameters
     fcr, fcl = 0.00269816, 0.00269816   #pixel size Focal Length for both cameras
     tetl = 0.26179938779914943653855361527329     #left camera rotation angle around Y axis (15 deg)
     tetr = -0.26179938779914943653855361527329    #right camera rotation angle
@@ -37,12 +42,14 @@ def camxyzparam(pxpy):
     y0r, y0l = 0, 0      #translation in Y direction
     z0r, z0l = 0, 0    
     ccddr, ccddl = 3.67, 3.67    #focal lenght for both cameras mm
-    ###################################################
+    
+    #translating from pixel coordinate to the point in world coordinate (onthe base surface?) in each camera
     x0, y0, z0 = x0r, y0r, z0r 
-    x1, y1, z1 = RotateAndTranslate(x0, y0, z0, pxpy, 0, fcr, ccddr, tetr, phir)
+    x1, y1, z1 = RotateAndTranslate(x0, y0, z0, pxpy, 0, fcr, ccddr, tetr, phir, cameraWidth, cameraHeight)
     x2, y2, z2 = x0l, y0l, z0l
-    x3, y3, z3 = RotateAndTranslate(x2, y2, z2, pxpy, 2, fcl, ccddl, tetl, phil)
+    x3, y3, z3 = RotateAndTranslate(x2, y2, z2, pxpy, 2, fcl, ccddl, tetl, phil, cameraWidth, cameraHeight)
 
+    #triangulation to calculate the depth of the point in relation to base surface
     u = [float(x1)-x0, float(y1)-y0, float(z1)-z0]
     v = [float(x3-x2), float(y3-y2), float(z3-z2)]
     p = [x0,y0,z0]
@@ -55,11 +62,6 @@ def camxyzparam(pxpy):
     abdist = np.add(p,np.multiply(s,u)) - np.add(q,np.multiply(t,v)) 
     return xyz, abdist
 
-
-
-XYZ, abdist=camxyzparam([960,540,960,540]) # test function
-print (XYZ)
-print (abdist)
 
 
 
@@ -112,7 +114,7 @@ def getTotalPointsFromBothCamera(rightcodmean, leftcodmean):
 
 
 
-def getTotalPoints(base_path, m, maskright, maskleft, maskrightindex, maskleftindex):
+def getTotalPoints(base_path, m, maskright, maskleft, maskrightindex, maskleftindex, cameraWidth, cameraHeight):
     camrcolor=cv2.imread(base_path +"CAMR/CAM001.png");
     camrcolol=cv2.imread(base_path +"CAML/CAM101.png");
     kk=0
@@ -127,8 +129,9 @@ def getTotalPoints(base_path, m, maskright, maskleft, maskrightindex, maskleftin
             matchpixels[1]=rightcodmean[maskrightindex[ii],2]
             matchpixels[2]=leftcodmean[maskleftindex[ii],1]
             matchpixels[3]=leftcodmean[maskleftindex[ii],2]
-            xyzdata,abdist=camxyzparam([matchpixels[0],matchpixels[1],matchpixels[2],matchpixels[3]])
+            xyzdata,abdist=camxyzparam([matchpixels[0],matchpixels[1],matchpixels[2],matchpixels[3]], cameraWidth, cameraHeight)
             #check if the points is in specified limit and distance between rays less than some values
+            #ignore points outside of the x and y of the wanted area and also distances beyond 20 (panel point?) 
             if ((np.linalg.norm(abdist)<20) and (xyzdata[2]>400 and xyzdata[2]<2000 and xyzdata[0]>-500 and xyzdata[0]<500)):
                xyz[kk,0]= -xyzdata[0]
                xyz[kk,1]= -xyzdata[1]
@@ -178,9 +181,11 @@ def saveAll(base_path, kk, xyz, xyzcolor):
 #==================================================================
 #==================================================================
 #==================================================================
-
-XYZ,abdist = camxyzparam([960,540,960,540]) # test function
+cameraWidth = 960 *2
+cameraHeight = 540 * 2
+XYZ,abdist = camxyzparam([960,540,960,540], cameraWidth, cameraHeight) # test function
 print (XYZ)
+print (abdist)
 
 base_path = "T:\\Darcy\\COMA-PLASTER\\"
 
@@ -188,9 +193,9 @@ base_path = "T:\\Darcy\\COMA-PLASTER\\"
 rightcodmean = getTotalPointsFromEachCamera('rightcod')
 leftcodmean = getTotalPointsFromEachCamera('leftcod')
 
-m,  maskright, maskleft, maskrightindex, maskleftindex = getTotalPointsFromBothCamera(rightcodmean, leftcodmean)
+m, maskright, maskleft, maskrightindex, maskleftindex = getTotalPointsFromBothCamera(rightcodmean, leftcodmean)
 
-kk, xyz, xyzcolor = getTotalPoints(base_path, m,  maskright, maskleft, maskrightindex, maskleftindex)
+kk, xyz, xyzcolor = getTotalPoints(base_path, m, maskright, maskleft, maskrightindex, maskleftindex, cameraWidth, cameraHeight)
 
 saveAll(base_path, kk, xyz, xyzcolor)
 print ('calcxyzcolor Done!\n\n\n')
