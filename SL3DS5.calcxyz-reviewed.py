@@ -1,6 +1,9 @@
 import numpy as np
 import cv2
 import math
+import csv
+
+
 def RotateAndTranslate( x, y, z, pxpy, i, fc, ccdd, tet, phi):
     x1, y1, z1 = -(pxpy[i]-960)*fc, (pxpy[i+1]-540)*fc, ccdd
     alfa, beta = tet, phi
@@ -58,26 +61,29 @@ XYZ,abdist=camxyzparam([960,540,960,540]) # test function
 print (XYZ)
 print (abdist)
 
+
+
 #==================================================================
 ii=0
 rightcod=[]
-import csv
 
 with open('rightcod', 'rt') as csvfile:
      xyreader = csv.reader(csvfile, delimiter=',', quotechar='|')
      for row in xyreader:
          rightcod.append([int(row[0]),int(row[1]),int(row[2])])
 
-a = np.array(rightcod)
-aa=a[a[:,0].argsort(),]
+a = np.array(rightcod) 
+aa=a[a[:,0].argsort(),] #Returns the indices that would sort an array.
 aaa, right_idx=np.unique(aa[:,0],return_index=True)
 
 m=aaa.size
 print ('Total points from right camera= ',m)
-rightcodmean=np.zeros([m,3])
+rightcodmean=np.zeros([m,3]) #m elements with 3 elements in each one
 
 for ii in range(0,m-1):
-    rightcodmean[ii]=[aaa[ii],np.mean(aa[right_idx[ii]:right_idx[ii+1],1]),np.mean(aa[right_idx[ii]:right_idx[ii+1],2])]
+    rightcodmean[ii] = [aaa[ii], 
+                        np.mean(aa[right_idx[ii]: right_idx[ii+1], 1]), 
+                        np.mean(aa[right_idx[ii]: right_idx[ii+1], 2])]
 
 csvfile.close()
 #==================================================================
