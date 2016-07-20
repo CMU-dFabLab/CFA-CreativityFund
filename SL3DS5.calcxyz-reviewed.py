@@ -3,7 +3,7 @@ import cv2
 import math
 def camxyzparam(pxpy):
     ##################################################### function for calculating X,Y, and Z of points   
-    fcl=0.00269816   #pixel size for left camera Focal Length	
+    fcl=0.00269816   #pixel size for left camera Focal Length   
     fcr=0.00269816  #pixel size for right camera
     tetl=0.26179938779914943653855361527329     #left camera rotation angle around Y axis (15 deg)
     tetr=-0.26179938779914943653855361527329    #right camera rotation angle
@@ -70,7 +70,7 @@ ii=0
 rightcod=[]
 import csv
 
-with open('rightcod', 'rb') as csvfile:
+with open('rightcod', 'rt') as csvfile:
      xyreader = csv.reader(csvfile, delimiter=',', quotechar='|')
      for row in xyreader:
          rightcod.append([int(row[0]),int(row[1]),int(row[2])])
@@ -90,7 +90,7 @@ csvfile.close()
 #==================================================================
 ii=0
 leftcod=[]
-with open('leftcod', 'rb') as csvfile:
+with open('leftcod', 'rt') as csvfile:
      xyreader = csv.reader(csvfile, delimiter=',', quotechar='|')
      for row in xyreader:
          leftcod.append([int(row[0]),int(row[1]),int(row[2])])
@@ -116,10 +116,10 @@ maskrightindex=np.searchsorted(rightcodmean[:,0],unicod)
 
 maskleft=np.in1d(unicod,leftcodmean[:,0])
 maskleftindex=np.searchsorted(leftcodmean[:,0],unicod)
+base_path = "T:\\Darcy\\COMA-PLASTER\\"
 
-
-camrcolor=cv2.imread("CAMR/CAM001.png");
-camrcolol=cv2.imread("CAML/CAM101.png");
+camrcolor=cv2.imread(base_path +"CAMR/CAM001.png");
+camrcolol=cv2.imread(base_path +"CAML/CAM101.png");
 
 
 
@@ -150,11 +150,11 @@ for ii in range(0,m-1):
 
 
 
-
 print ('Total points = ',kk-1)
 
 # open a PLY file to save the XYZ and colors of point cloud
-ff=open(captdirect+"/"+"pointcloud.ply","w")
+
+ff=open(base_path+"/"+"pointcloud.ply","w")
 ff.write('ply\n')
 ff.write('format ascii 1.0\n')
 ff.write('comment PCL generated\n')
@@ -168,8 +168,18 @@ ff.write('property uchar blue\n')
 ff.write('end_header\n')
 
 
+xs = open(base_path+"/"+"xs.csv","w")
+ys = open(base_path+"/"+"ys.csv","w")
+zs = open(base_path+"/"+"zs.csv","w")
 for ii in range(0,kk-1):
     ff.write(str(xyz[ii,0])+" "+str(xyz[ii,1])+" "+str(xyz[ii,2])+" "+str(xyzcolor[ii,0])+" "+str(xyzcolor[ii,1])+" "+str(xyzcolor[ii,2])+"\n")       
-
+    xs.write(str(xyz[ii,0]) + "\n")
+    ys.write(str(xyz[ii,1]) + "\n")
+    zs.write(str(xyz[ii,2]) + "\n")
 ff.close()
-print ('calcxyzcolor Done!')
+xs.close()
+ys.close()
+zs.close()
+
+
+print ('calcxyzcolor Done!\n\n\n')
