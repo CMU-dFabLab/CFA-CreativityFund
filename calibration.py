@@ -14,13 +14,20 @@ objp[:,:2] = np.mgrid[0:7,0:7].T.reshape(-1,2)
 objpoints = [] # 3d point in real world space
 imgpoints = [] # 2d points in image plane.
 
+###CHANGE: USE VIDEO CAPTURE (SEE STEP1)
 cap = cv2.VideoCapture(0)
 capture = False
 
 while(True):
-  if cv2.waitKey(1) & 0xFF == 119:
+  
+  key = cv2.waitKey(1)
+  
+  if key & 0xFF == 119:
     print("w")
     capture = True
+  
+  elif cv2.waitKey(1) & 0xFF == ord('q'):
+    break
 
   # if cv2.waitKey(0) & 0xFF == 97:
   #   print("a")
@@ -37,7 +44,7 @@ while(True):
   if ret == True and capture:
 
       corners2 = cv2.cornerSubPix(gray,corners,(11,11),(-1,-1),criteria)
-      imgpoints.append(corners.tolist())
+      imgpoints.append(corners2.tolist())
       objpoints.append(objp)
       # Draw and display the corners
       
@@ -47,19 +54,9 @@ while(True):
       
       capture = False      
 
-  if cv2.waitKey(1) & 0xFF == ord('q'):
-    break
-
-
 ret, img = cap.read()
 shape = img.shape[:2]
-print (imgpoints)
 ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, shape[::-1],None, None)
-# for vec in tvecs:
-#   print(vec)
 
 cap.release()
 cv2.destroyAllWindows()
-"""
-qqqqqq
-"""
