@@ -52,9 +52,9 @@ while(True):
 
 
 ret, img = cap.read()
-shape = img.shape
+shape = img.shape[:2]
 print (imgpoints)
-#ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, shape[::-1],None, None)
+ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, shape[::-1],None, None)
 # for vec in tvecs:
 #   print(vec)
 
