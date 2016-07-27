@@ -87,6 +87,22 @@ def getMatchpixels(newlistr, newlistl, colocrightsrt, colocleftsrt, rightsrtt, l
   matchpixels=np.zeros((np.size(camunio),4), dtype=np.int16)
   #for each unique value present in both right and left lists of pixels (camunio) 
   #find the first occurence in the original sorted list and store its coordinates  
+
+
+  for i in camunio:
+    while (newlistr[kkr] != i):
+        kkr=kkr+1
+        matchpixels[kk][0]=colocrightsrt[kkr][1]  # right camera x pixel coordinate
+        matchpixels[kk][1]=colocrightsrt[kkr][2]  # right camera y pixel coordinate
+    while (newlistl[kkl] != i):
+        kkl=kkl+1
+        matchpixels[kk][2]=colocleftsrt[kkl][1]   #left camera x pixel coordinate
+        matchpixels[kk][3]=colocleftsrt[kkl][2]   #left camera y pixel coordinate
+    kk=kk+1
+    
+
+
+  """
   for i in camunio:
       #find position of first pixel with the value i
       while (rightsrtt[kkr] != i):
@@ -100,6 +116,7 @@ def getMatchpixels(newlistr, newlistl, colocrightsrt, colocleftsrt, rightsrtt, l
       matchpixels[kk][3]=colocleftsrt[kkl][2]   #left camera y pixel coordinate
       kk=kk+1
 
+  """
   np.savetxt("colocuniq" , matchpixels ,fmt='%d', delimiter=',', newline='\n')
 
   return matchpixels
